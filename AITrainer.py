@@ -3,7 +3,7 @@ import numpy as np
 import time
 import PoseModule as pm
 
-cap = cv2.VideoCapture('IMG_5905.MOV')
+cap = cv2.VideoCapture('videsos/IMG_5905.MOV')
 img = cv2.imread('riley.jpg')
 detector = pm.poseDetector()
 
@@ -24,3 +24,6 @@ while True:
     cv2.imshow('Image',img)
     cv2.waitKey(1)
 
+
+
+## TODO: plot the angle/frame of the video
