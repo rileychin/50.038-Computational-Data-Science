@@ -5,6 +5,7 @@ import PoseModule as pm
 import matplotlib.pyplot as plt
 from os import listdir
 from os.path import isfile, join
+import pandas as pd
 
 path = "./videos"
 img = cv2.imread('riley.jpg')
@@ -42,7 +43,7 @@ def play_video(cap):
                 
         img = detector.findPose(img,False)
         
-        lmList = detector.findPosition(img,False)
+        lmList = detector.findPosition(img,False) #coordinates
         #print(lmList)
         if len(lmList) != 0:
             r_arm.append(round(detector.findAngle(img,12,14,16), 2))
@@ -54,56 +55,26 @@ def play_video(cap):
 
         cv2.imshow('Image',img)
         cv2.waitKey(1)
-    return r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip
-
-
-# def clean(l1, l2, l3, l4, l5, l6):
-#     # right = (max(l1)>max(l2))
-#     # left = (max(l2)>max(l1))
-#     # if right:
-#     pop = []
-#     l1new=[]
-#     l2new=[]
-#     l3new=[]
-#     l4new=[]
-#     l5new=[]
-#     l6new=[]
-#     for i in range(len(l1)):
-#         if l1[i] < 160:
-#             l1new.append(l1[i])
-#             l2new.append(l2[i])
-#             l3new.append(l3[i])
-#             l4new.append(l4[i])
-#             l5new.append(l5[i])
-#             l6new.append(l6[i])
-#     return l1new, l2new ,l3new,l4new,l5new,l6new
-
+    return r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip #length of each of these list = number of frames in video
 
 
 # Play all the videos to get angles
-for file in onlyfiles:
+
+for file in onlyfiles:          #for every file, run play_video, get r_arm etc etc
     print(file)
     cap = cv2.VideoCapture(f'videos/{file}')
-    r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = play_video(cap)
+    r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = play_video(cap) #calls play_video, gets result, for 1 video
     # r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = clean(r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip)
-    all_angles_list.append([r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip])
+    all_angles_list.append([r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip]) #
+    print (len(all_angles_list[0]))
+    print (all_angles_list[0])
+
+    all_angles_dic = {'r_arm': r_arm, 'l_arm' : l_arm, 'r_armpit': r_armpit ,'l_armpit':l_armpit , 'r_hip' : r_hip , 'l_hip' : l_hip}
+    data = pd.DataFrame(all_angles_dic)
+    
+    data.to_csv("/csv/" + file + ".csv")
 
 
-
-# for i in range(len(all_angles_list)):
-#     for j in range(6):
-#         print(len(all_angles_list[i][j]))
-
-# def plot_graph(right_angle_list,left_angle_list):
-#     right_angle_array = np.array(right_angle_list)
-#     left_angle_array = np.array(left_angle_list)
-#     x_array = np.arange(start=0, stop=right_angle_array.size)
-#     plt.scatter(np.arange(start=0, stop=right_angle_array.size),right_angle_array,c='r',label='right arm')
-#     plt.scatter(np.arange(start=0, stop=left_angle_array.size),left_angle_array,c='b',label='left arm')
-#     plt.xlabel("Frames")
-#     plt.ylabel("Angle")
-#     plt.legend()
-#     plt.show()
 
 def plot_all_graphs(all_angles_list):
     for i in range(len(all_angles_list)):
