@@ -57,9 +57,6 @@ def play_video(cap):
         cv2.waitKey(1)
     return r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip #length of each of these list = number of frames in video
 
-
-
-
 # Play all the videos to get angles
 
 for file in onlyfiles:          #for every file, run play_video, get r_arm etc etc
@@ -74,8 +71,6 @@ for file in onlyfiles:          #for every file, run play_video, get r_arm etc e
     all_angles_dic = {'r_arm': r_arm, 'l_arm' : l_arm, 'r_armpit': r_armpit ,'l_armpit':l_armpit , 'r_hip' : r_hip , 'l_hip' : l_hip}
     data = pd.DataFrame(all_angles_dic)
     data.to_csv("csv/" + file + ".csv")
-
-
 
 def plot_all_graphs(all_angles_list):
     for i in range(len(all_angles_list)):
