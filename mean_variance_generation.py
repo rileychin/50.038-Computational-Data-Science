@@ -10,15 +10,17 @@ import statistics
 
 
 path = "./videos"
-goodpath = "./videos/good"
-badpath = "./videos/bad"
-testpath = "./test"
+goodpath = "./videos/goodtrain"
+badpath = "./videos/badtrain"
+badtestpath = "./test/badtest"
+goodtestpath = "./test/goodtest"
 img = cv2.imread('riley.jpg')
 detector = pm.poseDetector()
 onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
 onlygoodfiles = [f for f in listdir(goodpath) if isfile(join(goodpath,f))]
 onlybadfiles = [f for f in listdir(badpath) if isfile(join(badpath,f))]
-testfiles = [f for f in listdir(testpath) if isfile(join(testpath,f))]
+badtestfiles = [f for f in listdir(badtestpath) if isfile(join(badtestpath,f))]
+goodtestfiles = [f for f in listdir(goodtestpath) if isfile(join(goodtestpath,f))]
 
 def addAngle(p1, p2, p3):
     item = round(detector.findAngle(img,p1,p2,p3), 2)
@@ -83,7 +85,7 @@ def main():
     # Play all the bad examples to get data
     for file in onlybadfiles:          #for every file, run play_video, get r_arm etc etc
         print(file)
-        cap = cv2.VideoCapture(f'videos/bad/{file}')
+        cap = cv2.VideoCapture(f'videos/badtrain/{file}')
         r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = play_video(cap) #calls play_video, gets result, for 1 video
 
         file_list.append(file)
@@ -104,7 +106,7 @@ def main():
     # Play all the good examples to get data
     for file in onlygoodfiles:          #for every file, run play_video, get r_arm etc etc
         print(file)
-        cap = cv2.VideoCapture(f'videos/good/{file}')
+        cap = cv2.VideoCapture(f'videos/goodtrain/{file}')
         r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = play_video(cap) #calls play_video, gets result, for 1 video
 
         file_list.append(file)
@@ -151,9 +153,9 @@ def main():
     classification = []
 
     # Play all test videos to get data
-    for file in testfiles:          #for every file, run play_video, get r_arm etc etc
+    for file in badtestfiles:          #for every file, run play_video, get r_arm etc etc
         print(file)
-        cap = cv2.VideoCapture(f'test/{file}')
+        cap = cv2.VideoCapture(f'test/badtest/{file}')
         r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = play_video(cap) #calls play_video, gets result, for 1 video
 
         file_list.append(file)
@@ -169,23 +171,40 @@ def main():
         r_hip_variance.append(get_variance(r_hip))
         l_hip_mean.append(get_mean(l_hip))
         l_hip_variance.append(get_variance(l_hip))
-        if "Good" in file or "good" in file:
-            classification.append(1)
-        else:
-            classification.append(0)
+        classification.append(0)
 
-        test_data = {'file': file_list, 
-        'r_arm_mean':r_arm_mean,'r_arm_variance':r_arm_variance,
-        'l_arm_mean':l_arm_mean, 'l_arm_variance':l_arm_variance,
-        'r_armpit_mean':r_armpit_mean,'r_armpit_variance':r_armpit_variance,
-        'l_armpit_mean':l_armpit_mean,'l_armpit_variance':l_armpit_variance,
-        'r_hip_mean':r_hip_mean,'r_hip_variance':r_hip_variance,
-        'l_hip_mean':l_hip_mean,'l_hip_variance':l_hip_variance,
-        'class': classification}
-        
-        dataFrame = pd.DataFrame(test_data)
-        print(dataFrame)
-        dataFrame.to_csv("csv/test.csv")
+    for file in goodtestfiles:          #for every file, run play_video, get r_arm etc etc
+        print(file)
+        cap = cv2.VideoCapture(f'test/goodtest/{file}')
+        r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = play_video(cap) #calls play_video, gets result, for 1 video
+
+        file_list.append(file)
+        r_arm_mean.append(get_mean(r_arm))
+        r_arm_variance.append(get_variance(r_arm))
+        l_arm_mean.append(get_mean(l_arm))
+        l_arm_variance.append(get_variance(l_arm))
+        r_armpit_mean.append(get_mean(r_armpit))
+        r_armpit_variance.append(get_variance(r_armpit))
+        l_armpit_mean.append(get_mean(l_armpit))
+        l_armpit_variance.append(get_variance(l_armpit))
+        r_hip_mean.append(get_mean(r_hip))
+        r_hip_variance.append(get_variance(r_hip))
+        l_hip_mean.append(get_mean(l_hip))
+        l_hip_variance.append(get_variance(l_hip))
+        classification.append(1)
+
+    test_data = {'file': file_list, 
+    'r_arm_mean':r_arm_mean,'r_arm_variance':r_arm_variance,
+    'l_arm_mean':l_arm_mean, 'l_arm_variance':l_arm_variance,
+    'r_armpit_mean':r_armpit_mean,'r_armpit_variance':r_armpit_variance,
+    'l_armpit_mean':l_armpit_mean,'l_armpit_variance':l_armpit_variance,
+    'r_hip_mean':r_hip_mean,'r_hip_variance':r_hip_variance,
+    'l_hip_mean':l_hip_mean,'l_hip_variance':l_hip_variance,
+    'class': classification}
+    
+    dataFrame = pd.DataFrame(test_data)
+    print(dataFrame)
+    dataFrame.to_csv("csv/mean_variance_test.csv")
 
 if __name__ == "__main__":
     main()

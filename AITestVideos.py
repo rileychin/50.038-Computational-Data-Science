@@ -9,7 +9,7 @@ import pandas as pd
 import os
 
 
-path = "videos"  ## note the path here
+path = "test"  ## note the path here
 img = cv2.imread('riley.jpg')
 detector = pm.poseDetector()
 onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
@@ -49,6 +49,7 @@ def play_video(cap):
         if img is None:
             break
                 
+        img = cv2.resize(img, (1280, 760))
         img = detector.findPose(img,False)
         
         lmList = detector.findPosition(img,False) #coordinates
@@ -100,12 +101,12 @@ for root, dirs, files in os.walk(path):          #for every file, run play_video
         r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = play_video(cap) #calls play_video, gets result, for 1 video
         # r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = clean(r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip)
 
-        if 'goodtrain' in root:
+        if 'goodtest' in root:
             goodorbad = 1
-            folder = "csv/traingoodcsv"
-        elif 'badtrain' in root :
+            folder = "csv/testgoodcsv"
+        elif 'badtest' in root :
             goodorbad = 0
-            folder = "csv/trainbadcsv"
+            folder = "csv/testbadcsv"
         else :
             goodorbad = ""
             folder = "csv"
@@ -119,7 +120,7 @@ for root, dirs, files in os.walk(path):          #for every file, run play_video
         mastercsvdata = pd.DataFrame(all_angles_list)
         mastercsvdata = mastercsvdata.rename(columns={0: "r_arm", 1: "l_arm", 2: "r_armpit", 3: "l_armpit", 4: "r_hip", 5: "l_lip", 6: "Good or Bad (1 for Good, 0 for Bad", 7: "Video name"})
         mastercsvdata = mastercsvdata.rename_axis("Video number")
-        mastercsvdata.to_csv("masterfile.csv")
+        mastercsvdata.to_csv("mastertestfile.csv")
 
 
         all_angles_dic = {'r_arm': r_arm, 'l_arm' : l_arm, 'r_armpit': r_armpit ,'l_armpit':l_armpit , 'r_hip' : r_hip , 'l_hip' : l_hip}
