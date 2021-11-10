@@ -135,7 +135,7 @@ def main():
     
     dataFrame = pd.DataFrame(data)
     print(dataFrame)
-    dataFrame.to_csv("csv/mean_variance.csv")
+    dataFrame.to_csv("csv/mean_variance.csv",index=False)
 
     file_list = []
     r_arm_mean = []
@@ -204,7 +204,7 @@ def main():
     
     dataFrame = pd.DataFrame(test_data)
     print(dataFrame)
-    dataFrame.to_csv("csv/mean_variance_test.csv")
+    dataFrame.to_csv("csv/mean_variance_test.csv",index=False)
 
 if __name__ == "__main__":
     main()

@@ -118,9 +118,8 @@ for root, dirs, files in os.walk(path):          #for every file, run play_video
 
 
         mastercsvdata = pd.DataFrame(all_angles_list)
-        mastercsvdata = mastercsvdata.rename(columns={0: "r_arm", 1: "l_arm", 2: "r_armpit", 3: "l_armpit", 4: "r_hip", 5: "l_lip", 6: "Good or Bad (1 for Good, 0 for Bad", 7: "Video name"})
-        mastercsvdata = mastercsvdata.rename_axis("Video number")
-        mastercsvdata.to_csv("mastertestfile.csv")
+        mastercsvdata = mastercsvdata.rename(columns={0: "r_arm", 1: "l_arm", 2: "r_armpit", 3: "l_armpit", 4: "r_hip", 5: "l_lip", 6: "class", 7: "file"})
+        mastercsvdata.to_csv("mastertestfile.csv",index=False)
 
 
         all_angles_dic = {'r_arm': r_arm, 'l_arm' : l_arm, 'r_armpit': r_armpit ,'l_armpit':l_armpit , 'r_hip' : r_hip , 'l_hip' : l_hip}
