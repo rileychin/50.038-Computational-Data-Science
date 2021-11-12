@@ -6,11 +6,18 @@ import matplotlib.pyplot as plt
 from os import listdir
 from os.path import isfile, join
 import pandas as pd
+import os
 
-path = "./videos"
+
+path = "videos"  ## note the path here
 img = cv2.imread('riley.jpg')
 detector = pm.poseDetector()
 onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
+
+# onlyfiles = []
+# for file in listdir(path):
+#     if isfile(join(path,files)):
+#         onlyfiles.append(file)
 
 # r_arm = []
 # l_arm = []
@@ -34,6 +41,7 @@ def play_video(cap):
     l_armpit = []
     r_hip = []
     l_hip = []
+
     while True:
         success, img = cap.read()
         # img = cv2.imread('riley.jpg')
@@ -59,28 +67,79 @@ def play_video(cap):
             r_hip.append(round(detector.findAngle(img,12, 24, 26), 2))
             l_hip.append(round(detector.findAngle(img,11, 23, 25), 2))
 
+<<<<<<< HEAD
         img = cv2.resize(img,(1080,720))
+=======
+
+>>>>>>> origin/master
         cv2.imshow('Image',img)
         cv2.waitKey(1)
     return r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip #length of each of these list = number of frames in video
 
-
-
-
 # Play all the videos to get angles
 
-for file in onlyfiles:          #for every file, run play_video, get r_arm etc etc
-    print(file)
-    cap = cv2.VideoCapture(f'videos/{file}')
-    r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = play_video(cap) #calls play_video, gets result, for 1 video
-    # r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = clean(r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip)
-    all_angles_list.append([r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip]) #
-    print (len(all_angles_list[0]))
-    print (all_angles_list[0])
+# for file in onlyfiles:          #for every file, run play_video, get r_arm etc etc
+#     print(file)
+#     cap = cv2.VideoCapture(f'videos/{file}') ## note the path here too
+#     r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = play_video(cap) #calls play_video, gets result, for 1 video
+#     # r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = clean(r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip)
+#     all_angles_list.append([r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip]) #
+#     #print (len(all_angles_list[0]))
+#     #print (all_angles_list[0])
+#
+#
+#     data2 = pd.DataFrame(all_angles_list)
+#     #data2.append("0")
+#     data2.to_csv("masterfile.csv")
+#
+#     all_angles_dic = {'r_arm': r_arm, 'l_arm' : l_arm, 'r_armpit': r_armpit ,'l_armpit':l_armpit , 'r_hip' : r_hip , 'l_hip' : l_hip}
+#     data = pd.DataFrame(all_angles_dic)
+#     data.to_csv("csv/" + file + ".csv") ## saves to which folder; note the path
+filepathlist = []
 
-    all_angles_dic = {'r_arm': r_arm, 'l_arm' : l_arm, 'r_armpit': r_armpit ,'l_armpit':l_armpit , 'r_hip' : r_hip , 'l_hip' : l_hip}
-    data = pd.DataFrame(all_angles_dic)
-    data.to_csv("csv/" + file + ".csv")
+
+for root, dirs, files in os.walk(path):          #for every file, run play_video, get r_arm etc etc
+    for file in files:
+        print(root)
+        videopath = join(root, file)
+        print (videopath)
+        filepathlist.append(file)
+
+        cap = cv2.VideoCapture(videopath) ## note the path here too
+
+        r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = play_video(cap) #calls play_video, gets result, for 1 video
+        # r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip = clean(r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip)
+
+        if 'goodtrain' in root:
+            goodorbad = 1
+            folder = "csv/traingoodcsv"
+        elif 'badtrain' in root :
+            goodorbad = 0
+            folder = "csv/trainbadcsv"
+        else :
+            goodorbad = ""
+            folder = "csv"
+
+
+        all_angles_list.append([r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip, goodorbad,file]) #
+        #print (len(all_angles_list[0]))
+        #print (all_angles_list[0])
+
+
+        mastercsvdata = pd.DataFrame(all_angles_list)
+        mastercsvdata = mastercsvdata.rename(columns={0: "r_arm", 1: "l_arm", 2: "r_armpit", 3: "l_armpit", 4: "r_hip", 5: "l_lip", 6: "class", 7: "file"})
+        mastercsvdata.to_csv("masterfile.csv",index=False)
+
+
+        all_angles_dic = {'r_arm': r_arm, 'l_arm' : l_arm, 'r_armpit': r_armpit ,'l_armpit':l_armpit , 'r_hip' : r_hip , 'l_hip' : l_hip}
+
+
+        data = pd.DataFrame(all_angles_dic)
+        data = data.rename_axis("frame number")
+        #data.to_csv("csv/" + file + ".csv") ## saves to which folder; note the path
+
+
+        data.to_csv(join (folder , file +".csv"))
 
 
 
@@ -93,7 +152,7 @@ def plot_all_graphs(all_angles_list):
         plt.scatter(np.arange(start=0, stop=len(all_angles_list[i][3])),np.array(all_angles_list[i][3]),c='yellow',label='left armpit')
         plt.scatter(np.arange(start=0, stop=len(all_angles_list[i][4])),np.array(all_angles_list[i][4]),c='purple',label='right hip')
         plt.scatter(np.arange(start=0, stop=len(all_angles_list[i][5])),np.array(all_angles_list[i][5]),c='brown',label='left hip')
-        plt.title(onlyfiles[i])
+        plt.title(filepathlist[i])
         plt.xlabel('Frame')
         plt.ylabel('Angle')
         plt.legend()
