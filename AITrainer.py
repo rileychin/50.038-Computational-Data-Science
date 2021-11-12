@@ -37,7 +37,7 @@ def play_video(cap):
     while True:
         success, img = cap.read()
         # img = cv2.imread('riley.jpg')
-        # img = cv2.resize(img,(720,720))
+        # img = cv2.resize(img,(1080,720))
         if img is None:
             break
                 
@@ -46,13 +46,20 @@ def play_video(cap):
         lmList = detector.findPosition(img,False) #coordinates
         #print(lmList)
         if len(lmList) != 0:
-            r_arm.append(round(detector.findAngle(img,12,14,16), 2))
-            l_arm.append(round(detector.findAngle(img,11,13,15), 2))
+            r_arm_angle = round(detector.findAngle(img,12,14,16), 2)
+            if r_arm_angle < 180:
+                r_arm_angle = 360-r_arm_angle
+            r_arm.append(r_arm_angle)
+            l_arm_angle = round(detector.findAngle(img,11,13,15), 2)
+            if l_arm_angle < 180:
+                l_arm_angle = 360-l_arm_angle
+            l_arm.append(l_arm_angle)
             r_armpit.append(round(detector.findAngle(img,14, 12, 24), 2))
             l_armpit.append(round(detector.findAngle(img,13, 11, 23), 2))
             r_hip.append(round(detector.findAngle(img,12, 24, 26), 2))
             l_hip.append(round(detector.findAngle(img,11, 23, 25), 2))
 
+        img = cv2.resize(img,(1080,720))
         cv2.imshow('Image',img)
         cv2.waitKey(1)
     return r_arm, l_arm, r_armpit, l_armpit, r_hip, l_hip #length of each of these list = number of frames in video
@@ -79,7 +86,7 @@ for file in onlyfiles:          #for every file, run play_video, get r_arm etc e
 
 def plot_all_graphs(all_angles_list):
     for i in range(len(all_angles_list)):
-        plt.subplot(2, np.ceil(len(all_angles_list)/2) , i+1)
+        plt.subplot(3, np.ceil(len(all_angles_list)/3) , i+1)
         plt.scatter(np.arange(start=0, stop=len(all_angles_list[i][0])),np.array(all_angles_list[i][0]),c='red',label='right arm')
         plt.scatter(np.arange(start=0, stop=len(all_angles_list[i][1])),np.array(all_angles_list[i][1]),c='blue',label='left arm')
         plt.scatter(np.arange(start=0, stop=len(all_angles_list[i][2])),np.array(all_angles_list[i][2]),c='green',label='right armpit')
